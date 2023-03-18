@@ -3,12 +3,12 @@ import numpy as np
 import csv
 
 
-#输入上一步得到的TPM文件
+#Input: the TPM files
 gene = pd.read_csv('gene_GSR_TPM.csv',header = 0)
 listchr=['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chrX','chrY']
 timelist=list(gene.columns[5:])
 gene['de']=0
-#删去所以时期都是0的enh/gene 这一步python遍历dataframe还挺慢的
+#delete the genes with no expression
 for k,row in gene.iterrows():
     if gene.loc[k,timelist].any()==0:
         gene.loc[k,'de'] = -1
@@ -25,10 +25,10 @@ enh_clean=enh[(enh['de']==0)&(enh['chr'].isin(listchr))]
 enh_clean.drop('de',axis=1,inplace=True)
 enh_clean.set_index('chr',inplace=True)
 
-#遍历gene_GSR_TPM文件，找到+-1Mbp的enh
+#go over gene_GSR_TPM files，find enhancers that located +-1Mbp of the gene location
 with open('gene_GSR_clean.csv', 'r') as f:
     lines1 = f.read().splitlines()
-#输出enh-gene pairs的文件
+#output enh-gene pairs files
 f4 = open('gene_1Mbp_enh_GSR.csv','w',newline='')
 writer = csv.writer(f4)
 writer.writerow(['chr','gene_id','enh_id','corr'])
@@ -43,12 +43,12 @@ for genel in lines1:
     gs=int(gene[2])
     ge=int(gene[3])
     gene_tpm=list(map(float, gene[5:]))
-    #这里为了加速每次只把gene所在的chr的enh输出，前面也对应把enh的chr设为了dataframe索引。但感觉加速效果也不是很明显
+    # Set chr as indices for faster indexing
     if chrg!=chr0:
         dft=enh_clean.loc[chrg,]
         dft.to_csv(chrg)
         chr0=chrg
-    #遍历所输出的某个chr的enh信息的文件，选出+-1Mbp的enhancer
+    # Go over the enhancers in the chr and fetch enhancers that located +-1Mbp of the gene position
     with open(chrg, 'r') as f2:
         linese = f2.read().splitlines()
     for enhl in linese:

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import csv
 
-#peaks的初步处理，peaks格式中要有'chr','start','end','length','abs_summit','source'，且为csv或tab格式
+#genearate clean table for peaks, with column 'chr','start','end','length','abs_summit','source'
 def clean_table(pwd):
     listchr=['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chrX','chrY']
     if "csv" in pwd:
@@ -21,7 +21,7 @@ def index(i,df):
         k= df.loc[i,'MergeTo']
     return i
 
-##pwdlist中输入所有要合并的peaks文件的路径来源
+##pwdlist contains all the peak files from NGS sequencing and Enhanceratlas
 tablelist=[]
 pwdlist=["whyte_mm10.csv","EnhancerAtlas2.0_mm10.csv","ATAC_L2C.txt","ATAC_4C.txt","ATAC_8C.txt","ATAC_ICM.txt","DNase_2C.txt","DNase_4C.txt","DNase_8C.txt","DNase_MII-Oocyte.txt","DNase_morula.txt","ATAC_E2C.csv","ATAC_E2C2.csv","H3K27ac_2C.csv","H3K27ac_8C.csv","H3K27ac_Oocytes.csv"]
 for i in pwdlist:
@@ -39,7 +39,7 @@ for i in range(0,len(df_sorted)):
         listchr.append(i)
 listchr.append(len(df_sorted))
 
-#合并峰之间距离小于100的,并改start和end
+# merge peaks with distance less than 100bp to a larger region
 for i in range(0,21):
     Start = listchr[i]
     End = listchr[i+1]
@@ -64,6 +64,6 @@ for i in range(1,len(uniquelist)):
     merged_co.loc[uniquelist[i],'start'] = start
     merged_co.loc[uniquelist[i],'end'] = end
     merged_co.loc[uniquelist[i],'source'] = ";".join(alls)
-#输出结果
+#output
 merged_co.to_csv('merged.csv',index=False)
 

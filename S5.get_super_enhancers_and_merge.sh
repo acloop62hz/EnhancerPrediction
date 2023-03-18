@@ -1,3 +1,7 @@
+# This script combine bioinfomatics tools ROSE (https://bitbucket.org/young_computation/rose/src/master/)
+# to find superenhancers based our own enhancer outputs
+
+
 #1.get all super enhancers together
 cat list|while read i g
 do
